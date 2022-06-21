@@ -1,0 +1,67 @@
+default_input_ = {
+    "simulation": {
+        "generate_micrographs": "yes",
+        "log_file": "simulator.log"
+    },
+
+    "sample": {
+        "diameter": 1000, # nm
+        "thickness_edge": 100, #nm
+        "thickness_center": 50, #nm
+    },
+
+    "geometry": {
+        "gen_tilt_data": "yes",
+        "ntilts": 61,
+        "theta_start": -60, # degree
+        "theta_incr": 2, # degree
+        "geom_errors": "none"
+    },
+
+    "electronbeam": {
+        "acc_voltage": 200, #kv
+        "energy_spread": 1.3, #eV
+        "gen_dose": "yes",
+        "total_dose": 6000, # electrons per square nanometer
+    },
+    "optics": {
+        "magnification": 30000,
+        "cs": 2, #mm
+        "cc": 2, #mm
+        "aperture": 50, #micrometer
+        "focal_length": 3, #mm
+        "cond_ap_angle": 0.1, #milliradian
+        "gen_defocus": "yes",
+        "defocus_nominal": 5 #micrometer
+    },
+    "detectors": {
+        1: {
+            "det_pix_x": 1024,
+            "det_pix_y": 1024,
+            "pixel_size": 15, # microns
+            "gain": 10,
+            "use_quantization": "yes",
+            "dqe": 0.4,
+            "mtf_a": 0.7,
+            "mtf_b": 0.2,
+            "mtf_c": 0.1,
+            "mtf_alpha": 10,
+            "mtf_beta": 40,
+            "image_file_out": "tiltseries.mrc"
+        },
+        2: {
+            "det_pix_x": 1024,
+            "det_pix_y": 1024,
+            "pixel_size": 15, # microns
+            "gain": 10,
+            "use_quantization": "no",
+            "dqe": 0.4,
+            "mtf_a": 0.7,
+            "mtf_b": 0.2,
+            "mtf_c": 0.1,
+            "mtf_alpha": 10,
+            "mtf_beta": 40,
+            "image_file_out": "tiltseries_nonoise.mrc"
+        }
+    }
+}
