@@ -10,10 +10,27 @@ python setup.py sdist
 pip install dist/tem-simulator-scripts-0.1.tar.gz
 ```
 
+Make also sure that IMOD is installed, as the `tsimscripts_pipe.sh` needs the commands `submfg` and `trimvol` from IMOD.
+
 ## Preparation
 
 Download all PDBs you want to simulate. In case PDB is not available (only PDBx or mmcif), download
-PDBX or mmcif and convert it to PDB with https://mmcif.pdbj.org/converter/index.php?l=en
+PDBX or mmcif and convert it to PDB with https://mmcif.pdbj.org/converter/index.php?l=en . Its recommended to download
+directely the biological assemblies.
+
+## Overview
+
+Here we give a short overview of the scripts contained in this package:
+
+ - **tsimscripts_pipe.sh**: This is probably the only script a user needs from this collection.
+ - **tsimscripts_gen_coords.py**: GEn
+ - **tsimscripts_gen_input.py**: This script generates the input file for the TEM-Simulator.
+ - tsimscripts_gen_filaments.py
+ - tsimscripts_gen_raw_tilt.py
+ - tsimscripts_gen_trans_file.py 
+ - tsimscripts_gen_map.py
+
+ - tsimscripts_extract.py
 
 
 ## Pipeline all commands
@@ -36,7 +53,7 @@ You can also run each step individually in case you want to have more control:
 
 0. Install the package with python setup.py install
 1. Optional: Generate trans files using `tsimscripts_gen_trans_file.py`. Not necessary when using biological assemblies directly.
-2. Optional: Generate fiducial using `tsimscripts_gen_map.py`: I would add 8-10 fiduicals. Patch tracking didnt work well for me.
+2. Optional: Generate fiducial using `tsimscripts_gen_map.py`: I would add 8-10 fiduicals. Patch tracking didnt work well.
 3. Generate coordinate `tsimscripts_gen_coords.py`
 4. Generate input file using `tsimscripts_gen_input_file.py`
 5. Generate raw tilt file with `tsimscripts_gen_raw_tilt.py`
