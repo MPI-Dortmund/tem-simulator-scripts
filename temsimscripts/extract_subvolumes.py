@@ -54,7 +54,7 @@ class ParticleLike:
 
         return subvol
 
-def extract_and_write(particles: Dict[str,List[ParticleLike]], volume: np.array, output_dir: Path, prefix: str = "") -> None:
+def extract_and_write(particles: Dict[str,List[ParticleLike]], volume: np.array, output_dir: Path, prefix: str = "", apix=None) -> None:
     '''Writes coordinates to disk, so that our SHREC evaluation script can read'''
     #if not output_dir.exists():
     output_dir.mkdir(exist_ok=True, parents=True)
@@ -77,11 +77,22 @@ def extract_and_write(particles: Dict[str,List[ParticleLike]], volume: np.array,
             coords.append([particle.x, particle.y, particle.z])
             pos_data.append([particle.identifier, particle.x, particle.y, particle.z, np.NaN, np.NaN, np.NaN])
             with mrcfile.new(output_dir.joinpath(prefix + particle.identifier + '_' + num_str + '.mrc')) as newmrc:
+                if apix:
+                    newmrc.voxel_size = apix
                 newmrc.set_data(subvol)
         print("S:", id, np.array(coords).shape)
         np.savetxt(output_dir_coords.joinpath(id+".coords"), np.array(coords), fmt='%f')
     df = pd.DataFrame(pos_data)
     df.to_csv(output_dir.joinpath("particle_positions.txt"), header=False, index=False, na_rep="NaN")
+
+def read_apix(path_vol: Path):
+
+    if path_vol.exists() and path_vol.is_file():
+        with mrcfile.mmap(path_vol) as mrc:
+            return mrc.voxel_size
+    else:
+        raise ValueError("Your input volume does not exist.")
+    return None
 
 def read_volume(path_vol: Path) -> np.array:
     if path_vol.exists() and path_vol.is_file():
@@ -157,6 +168,7 @@ def run(args) -> None:
     prefix = args.prefix
 
     volume = read_volume(path_vol)
+    apix = read_apix(path_vol)
 
     particles = read_particles(path_coord, box_size)
 
@@ -166,7 +178,7 @@ def run(args) -> None:
         for p in particles[id]:
             p.make_coord_LL(volume_shape=volume.shape)
 
-    extract_and_write(particles=particles, volume=volume,output_dir=path_out, prefix=prefix)
+    extract_and_write(particles=particles, volume=volume,output_dir=path_out, prefix=prefix, apix=apix)
 
 def create_parser() -> argparse.ArgumentParser:
     """Creates parser"""
