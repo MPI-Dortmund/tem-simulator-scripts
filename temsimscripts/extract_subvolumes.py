@@ -77,9 +77,9 @@ def extract_and_write(particles: Dict[str,List[ParticleLike]], volume: np.array,
             coords.append([particle.x, particle.y, particle.z])
             pos_data.append([particle.identifier, particle.x, particle.y, particle.z, np.NaN, np.NaN, np.NaN])
             with mrcfile.new(output_dir.joinpath(prefix + particle.identifier + '_' + num_str + '.mrc')) as newmrc:
+                newmrc.set_data(subvol)
                 if apix:
                     newmrc.voxel_size = apix
-                newmrc.set_data(subvol)
         print("S:", id, np.array(coords).shape)
         np.savetxt(output_dir_coords.joinpath(id+".coords"), np.array(coords), fmt='%f')
     df = pd.DataFrame(pos_data)
