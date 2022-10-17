@@ -6,8 +6,7 @@ This repository contains convenient scripts for the TEM-Simulator V1.3 (http://t
 ```
 conda create -n temscripts -c conda-forge python=3.9 biotite
 conda activate temscripts
-python setup.py sdist
-pip install dist/tem-simulator-scripts-0.1.tar.gz
+pip install tem-simulator-scripts
 ```
 
 Make also sure that IMOD is installed, as the `tsimscripts_pipe.sh` needs the commands `submfg` and `trimvol` from IMOD.
