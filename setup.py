@@ -8,9 +8,9 @@ setup(
     packages=[
         'temsimscripts'
     ],
-    url='',
-    license='MIT',
-    author='Thorsten Wagner',
+    url='https://github.com/MPI-Dortmund/tem-simulator-scripts',
+    license='Mozilla Public License Version 2.0',
+    author='Thorsten Wagner, Markus Stabrin',
     install_requires=[
         "numpy >= 1.20.0",
         "mrcfile",
