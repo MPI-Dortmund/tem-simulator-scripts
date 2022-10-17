@@ -10,7 +10,7 @@ setup(
     ],
     url='https://github.com/MPI-Dortmund/tem-simulator-scripts',
     license='Mozilla Public License Version 2.0',
-    author='Thorsten Wagner, Markus Stabrin',
+    author='Thorsten Wagner, Markus Stabrin, Gavin Rice',
     install_requires=[
         "numpy >= 1.20.0",
         "mrcfile",
