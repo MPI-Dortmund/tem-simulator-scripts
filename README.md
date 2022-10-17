@@ -22,14 +22,13 @@ directely the biological assemblies.
 Here we give a short overview of the scripts contained in this package:
 
  - **tsimscripts_pipe.sh**: This is probably the only script a user needs from this collection.
- - **tsimscripts_gen_coords.py**: GEn
+ - **tsimscripts_gen_coords.py**: Generates coordinates for particles that are not overlapping.
  - **tsimscripts_gen_input.py**: This script generates the input file for the TEM-Simulator.
- - tsimscripts_gen_filaments.py
- - tsimscripts_gen_raw_tilt.py
- - tsimscripts_gen_trans_file.py 
- - tsimscripts_gen_map.py
-
- - tsimscripts_extract.py
+ - **tsimscripts_gen_filaments.py**: Generate simulated filaments.
+ - **tsimscripts_gen_raw_tilt.py**: Generates the raw tilt file for IMOD.
+ - **tsimscripts_gen_trans_file.py**: Some PDBs needs transfile. Simply use assemblies to avoid this script. 
+ - **tsimscripts_gen_map.py**: Script to generates vesicle or fiducial maps.
+ - **tsimscripts_extract.py**: Extracts subvolumes of the simulated tomogramns.
 
 
 ## Pipeline all commands
