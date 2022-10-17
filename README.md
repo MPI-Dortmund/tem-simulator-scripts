@@ -26,9 +26,9 @@ Here we give a short overview of the scripts contained in this package:
  - **tsimscripts_gen_input.py**: This script generates the input file for the TEM-Simulator.
  - **tsimscripts_gen_filaments.py**: Generate simulated filaments.
  - **tsimscripts_gen_raw_tilt.py**: Generates the raw tilt file for IMOD.
- - **tsimscripts_gen_trans_file.py**: Some PDBs needs transfile. Simply use assemblies to avoid this script. 
+ - **tsimscripts_gen_trans_file.py**: Some PDBs needs transformation files. Simply use assemblies to avoid this script. 
  - **tsimscripts_gen_map.py**: Script to generates vesicle or fiducial maps.
- - **tsimscripts_extract.py**: Extracts subvolumes of the simulated tomogramns.
+ - **tsimscripts_extract.py**: Extracts subvolumes of the simulated tomogram.
 
 
 ## Pipeline all commands
