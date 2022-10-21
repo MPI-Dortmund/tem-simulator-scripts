@@ -95,6 +95,7 @@ do
         --defocus_upper) defocus_upper=${2}; shift; shift;;
         --thickness) thickness=${2}; shift; shift;;
         --s1) early_abort=true; shift;;
+        *) echo "unknown option ${1}"; exit 1
     esac
 done
 mkdir -p $(dirname ${output})
@@ -132,11 +133,7 @@ echo PDBS FIL: ${pdbs_fil[@]}
 echo SETTINGS FIL: ${settings_fil[@]}
 echo NSUBS: ${nsubs[@]}
 
-echo $(date) - Generate filaments
 cp ${pdbs[@]} ${particle_pdb_dir}
-cp ${pdbs_fil[@]} ${filament_pdb_dir_in}
-cp ${settings_fil[@]} ${filament_pdb_dir_in}
-tsimscripts_gen_filaments.py --pdbs ${filament_pdb_dir_in}/*.pdb --settings ${filament_pdb_dir_in}/*.json --nsubs ${nsubs[@]} ${seed_cmd_3} -o ${filament_pdb_dir}
 
 echo $(date) - Generate PDB to MRC input files
 tsimscripts_gen_input.py particle --pdbs ${particle_pdb_dir}/*.pdb --output_file ${ptcls_dir}/input.txt
@@ -146,13 +143,23 @@ TEM-simulator input.txt
 rm *_map_im.mrc
 cd -
 
-echo $(date) - Generate PDB to MRC input files filament
-tsimscripts_gen_input.py particle --pdbs ${filament_pdb_dir}/*.pdb  --output_file ${ptcls_fil_dir}/input.txt
-cd ${ptcls_fil_dir}
-echo $(date) - Run PDB to MRC filament
-TEM-simulator input.txt
-rm *_map_im.mrc
-cd -
+if [[ ${#pdbs_fil} -ne 0 ]]
+then
+    echo $(date) - Generate filaments
+    cp ${pdbs_fil[@]} ${filament_pdb_dir_in}
+    cp ${settings_fil[@]} ${filament_pdb_dir_in}
+    tsimscripts_gen_filaments.py --pdbs ${filament_pdb_dir_in}/*.pdb --settings ${filament_pdb_dir_in}/*.json --nsubs ${nsubs[@]} ${seed_cmd_3} -o ${filament_pdb_dir}
+
+    echo $(date) - Generate PDB to MRC input files filament
+    tsimscripts_gen_input.py particle --pdbs ${filament_pdb_dir}/*.pdb  --output_file ${ptcls_fil_dir}/input.txt
+    cd ${ptcls_fil_dir}
+    echo $(date) - Run PDB to MRC filament
+    TEM-simulator input.txt
+    rm *_map_im.mrc
+    cd -
+else
+    echo $(date) - Skip generate filaments
+fi
 
 echo $(date) - Generate fiducial template
 tsimscripts_gen_map.py fiducial -d ${fiducialsize} --apix 1 --value 10000 --output_file ${fiducial_dir}/fiducial.mrc
@@ -161,13 +168,24 @@ echo $(date) - Generate vesicle template
 tsimscripts_gen_map.py vesicle -d ${vesiclesize} --apix 10 --value 2 --output_file ${fiducial_dir}/vesicle.mrc
 
 echo $(date) - Generate coordinates
-tsimscripts_gen_coords.py --pdbs ${filament_pdb_dir}/*.pdb --npdbs 3 --ptcls ${ptcls_fil_dir}/*.mrc ${seed_cmd_1} -o ${coords_fil_dir} --write_occupancy --write_raw_occupancy --tilt_range 15 --max_trials_pos 20 --max_trials_rot 20 --allow_clip --vheight ${thickness}
-tsimscripts_gen_coords.py --pdbs ${particle_pdb_dir}/*.pdb --npdbs ${npdbs[@]} --maps ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc --nmaps ${nfiducial} ${nvesicle} --ptcls ${ptcls_dir}/*.mrc ${seed_cmd_2} -o ${coords_dir} --write_occupancy --occupancy ${coords_fil_dir}/occupancy_raw.mrc --value_offset ${#pdbs_fil[@]} --vheight ${thickness}
+if [[ ${#pdbs_fil} -ne 0 ]]
+then
+    tsimscripts_gen_coords.py --pdbs ${filament_pdb_dir}/*.pdb --npdbs 3 --ptcls ${ptcls_fil_dir}/*.mrc ${seed_cmd_1} -o ${coords_fil_dir} --write_occupancy --write_raw_occupancy --tilt_range 15 --max_trials_pos 20 --max_trials_rot 20 --allow_clip --vheight ${thickness}
+    tsimscripts_gen_coords.py --pdbs ${particle_pdb_dir}/*.pdb --npdbs ${npdbs[@]} --maps ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc --nmaps ${nfiducial} ${nvesicle} --ptcls ${ptcls_dir}/*.mrc ${seed_cmd_2} -o ${coords_dir} --write_occupancy --occupancy ${coords_fil_dir}/occupancy_raw.mrc --value_offset ${#pdbs_fil[@]} --vheight ${thickness}
+else
+    tsimscripts_gen_coords.py --pdbs ${particle_pdb_dir}/*.pdb --npdbs ${npdbs[@]} --maps ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc --nmaps ${nfiducial} ${nvesicle} --ptcls ${ptcls_dir}/*.mrc ${seed_cmd_2} -o ${coords_dir} --write_occupancy --vheight ${thickness}
+fi
 
 
 [[ ${early_abort} == true ]] && exit 0
+
 echo $(date) - Generate 3D simulation input files
-tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc ${filament_pdb_dir}/*.pdb --coords ${coords_dir}/*.txt ${coords_fil_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness}
+if [[ ${#pdbs_fil} -ne 0 ]]
+then
+    tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc ${filament_pdb_dir}/*.pdb --coords ${coords_dir}/*.txt ${coords_fil_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness}
+else
+    tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc --coords ${coords_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness}
+fi
 
 cd ${simulation_dir}
 echo $(date) - Run 3D simulation
