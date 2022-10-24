@@ -1,13 +1,14 @@
 """
 This script will generate the coordinates for a specific tomogram.
 """
+import typing
 
 import mrcfile
 import argparse
 import tempfile
 from typing import List, Protocol, Tuple, Callable
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 from skimage.transform import rescale, resize, downscale_local_mean
 from biotite import structure as struc
@@ -43,6 +44,9 @@ class OccupancyVolume:
     """
 
     volume: NDArray
+    particles_placed: int = 0
+    particle_id_volume: NDArray = None
+    particle_sizes: typing.Dict[str, int] = field(default_factory=dict)
 
     def size(self) -> int:
         return self.volume.size
@@ -50,22 +54,51 @@ class OccupancyVolume:
     def shape(self) -> tuple:
         return self.volume.shape
 
-    def is_occupied(self, vol_slice: NDArray, mask: NDArray) -> bool:
+
+    def is_occupied(self, vol_slice: NDArray, mask: NDArray, allowd_overlap=0.05) -> bool:
         '''
         Check if position in already occupied.
         '''
 
-        return np.any(self.volume[vol_slice][mask] >= 1)
+        occupied = self.volume[vol_slice][mask] >= 1
+        occ = np.any(occupied)
+        if not occ:
+            return False
+        particle_ids = [k for k in np.unique(self.particle_id_volume[vol_slice][mask]) if k > 0]
+        relative_overlaps = []
+        for id in particle_ids:
+            mask_overlap_pid = self.particle_id_volume[vol_slice][mask]==id
+            particle_class = np.unique(self.volume[vol_slice][mask][mask_overlap_pid])
+            assert len(particle_class) == 1
+            particle_class = particle_class[0]
+            overlap_metric = np.sum(mask_overlap_pid)/min(self.particle_sizes[str(particle_class)],np.sum(mask))
+            relative_overlaps.append(overlap_metric)
+
+        relative_overlap = np.max(relative_overlaps)
+
+        if relative_overlap < allowd_overlap:
+            return False
+        return occ
 
     def occupy(self, vol_slice: NDArray, volume: NDArray, value: int) -> bool:
         '''
         Occupies a part of the volume
         '''
+
+        if self.particle_id_volume is None:
+            self.particle_id_volume = np.zeros(shape=self.volume.shape, dtype=np.int16)
+
         mask = volume > 0
+        if str(value) not in self.particle_sizes:
+            self.particle_sizes[str(value)] = int(np.sum(mask))
+
+
         if self.is_occupied(vol_slice, mask):
             return False
-
+        self.particles_placed=self.particles_placed+1
         self.volume[vol_slice][mask] = value
+        self.particle_id_volume[vol_slice][mask] = self.particles_placed
+
         return True
 
 
@@ -384,6 +417,8 @@ def generate_positions(
         binarized_particle_volume = gen_bin(particle, current_ndilations, phi, thetha, psi)
         unsucessfull_tries = 0
         unsucessfull_tries_rot = 0
+        placed_done = 0
+        free_positions = np.where(occupancy.volume == 0)
         while particles_placed < number_occ_particle:
             if unsucessfull_tries >= max_trials_pos:
                 unsucessfull_tries = 0
@@ -393,9 +428,15 @@ def generate_positions(
                     break
                 phi, thetha, psi = gen_orientation(tilt_range)
                 binarized_particle_volume = gen_bin(particle, current_ndilations, phi, thetha, psi)
-            center_0 = np.random.rand() * occupancy.shape()[0]
-            center_1 = np.random.rand() * occupancy.shape()[1]
-            center_2 = np.random.rand() * occupancy.shape()[2]
+            if particles_placed%100==0 and placed_done!=particles_placed:
+                free_positions = np.where(occupancy.volume==0)
+                placed_done = particles_placed
+
+            rand_position_index = np.random.randint(low=0,high=len(free_positions[0]))
+
+            center_0 = free_positions[0][rand_position_index] #np.random.rand() * occupancy.shape()[0]
+            center_1 = free_positions[1][rand_position_index] #np.random.rand() * occupancy.shape()[1]
+            center_2 = free_positions[2][rand_position_index] #np.random.rand() * occupancy.shape()[2]
 
             pos = (center_0, center_1, center_2, phi, thetha, psi)
 
@@ -606,12 +647,12 @@ def run(args) -> None:
     vdiameter = args.vdiameter
     vheight = args.vheight
     output = args.output
-    ndilations = args.ndilations
+    ndilations = 0 #args.ndilations
 
     allow_clip = args.allow_clip
     tilt_range = args.tilt_range
     max_trials_rot = args.max_trials_rot
-    max_trials_pos = args.max_trials_pos
+    max_trials_pos = 6000#args.max_trials_pos
     value_offset = args.value_offset
 
     if args.random_seed is None:
@@ -646,8 +687,16 @@ def run(args) -> None:
             )
         )
     else:
+        class_size_dict = None
+        with open(os.path.join(os.path.dirname(args.occupancy),"class_size_dict.json"), 'r') as f:
+            class_size_dict = json.load(f)
+
+        pid_vol = None
+        with mrcfile.open(os.path.join(os.path.dirname(args.occupancy),"occupancy_pid.mrc"), permissive=True, mode='r+') as mrc:
+            pid_vol = mrc.data
+
         with mrcfile.open(args.occupancy, permissive=True) as mrc:
-            occupancy = OccupancyVolume(volume=mrc.data)
+            occupancy = OccupancyVolume(volume=mrc.data, particle_id_volume=pid_vol, particle_sizes=class_size_dict, particles_placed=np.max(pid_vol))
             occupancy.volume.setflags(write=1)
 
 
@@ -662,7 +711,7 @@ def run(args) -> None:
     )
     print("sort particles")
     particles.sort(key=lambda x:  np.sum(
-        fill(dilate(get_binary_func(x)(x, particle_position=(0,0,0,0,0,0)), ndilations=1))
+        fill(dilate(get_binary_func(x)(x, particle_position=(0,0,0,0,0,0)), ndilations=ndilations))
     ), reverse=True)
 
     # Generate positions
@@ -715,6 +764,14 @@ def run(args) -> None:
             mrc.set_data(occupancy.volume)
             mrc.voxel_size = 10.20
             mrc.header.origin.z = -1024
+
+        with mrcfile.new(os.path.join(output, 'occupancy_pid.mrc'), overwrite=True) as mrc:
+            mrc.set_data(occupancy.particle_id_volume)
+            mrc.voxel_size = 10.20
+            mrc.header.origin.z = -1024
+        with open(os.path.join(output, "class_size_dict.json"), "w") as outfile:
+            json.dump(occupancy.particle_sizes, outfile)
+
 
 
 def _main_():
