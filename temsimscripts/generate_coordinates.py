@@ -434,9 +434,9 @@ def generate_positions(
 
             rand_position_index = np.random.randint(low=0,high=len(free_positions[0]))
 
-            center_0 = free_positions[0][rand_position_index] #np.random.rand() * occupancy.shape()[0]
-            center_1 = free_positions[1][rand_position_index] #np.random.rand() * occupancy.shape()[1]
-            center_2 = free_positions[2][rand_position_index] #np.random.rand() * occupancy.shape()[2]
+            center_0 = free_positions[0][rand_position_index]
+            center_1 = free_positions[1][rand_position_index]
+            center_2 = free_positions[2][rand_position_index]
 
             pos = (center_0, center_1, center_2, phi, thetha, psi)
 
