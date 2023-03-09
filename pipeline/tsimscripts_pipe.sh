@@ -162,7 +162,7 @@ tsimscripts_gen_map.py vesicle -d ${vesiclesize} --apix 10 --value 2 --output_fi
 
 echo $(date) - Generate coordinates
 tsimscripts_gen_coords.py --pdbs ${filament_pdb_dir}/*.pdb --npdbs 3 --ptcls ${ptcls_fil_dir}/*.mrc ${seed_cmd_1} -o ${coords_fil_dir} --write_occupancy --write_raw_occupancy --tilt_range 15 --max_trials_pos 20 --max_trials_rot 20 --allow_clip --vheight ${thickness}
-tsimscripts_gen_coords.py --maps ${fiducial_dir}/vesicle.mrc --nmaps ${nvesicle} --ptcls ${ptcls_dir}/*.mrc ${seed_cmd_2} -o ${coords_dir} --write_occupancy --occupancy ${coords_fil_dir}/occupancy_raw.mrc --value_offset ${#pdbs_fil[@]} --vheight ${thickness} --allowed_overlap 0
+tsimscripts_gen_coords.py --maps ${fiducial_dir}/vesicle.mrc --nmaps ${nvesicle} --ptcls ${ptcls_dir}/*.mrc ${seed_cmd_2} -o ${coords_dir} --write_occupancy --occupancy ${coords_fil_dir}/occupancy_raw.mrc --value_offset ${#pdbs_fil[@]} --vheight ${thickness} --overlap 0
 tsimscripts_gen_coords.py --pdbs ${particle_pdb_dir}/*.pdb --npdbs ${npdbs[@]} --maps ${fiducial_dir}/fiducial.mrc --nmaps ${nfiducial} --ptcls ${ptcls_dir}/*.mrc ${seed_cmd_2} -o ${coords_dir} --write_occupancy --occupancy ${coords_fil_dir}/occupancy_raw.mrc --value_offset ${#pdbs_fil[@]} --vheight ${thickness}
 
 
