@@ -80,7 +80,7 @@ class OccupancyVolume:
             return False
         return occ
 
-    def occupy(self, vol_slice: NDArray, volume: NDArray, value: int) -> bool:
+    def occupy(self, vol_slice: NDArray, volume: NDArray, value: int, allowd_overlap: float=0.05) -> bool:
         '''
         Occupies a part of the volume
         '''
@@ -93,7 +93,7 @@ class OccupancyVolume:
             self.particle_sizes[str(value)] = int(np.sum(mask))
 
 
-        if self.is_occupied(vol_slice, mask):
+        if self.is_occupied(vol_slice, mask, allowd_overlap):
             return False
         self.particles_placed=self.particles_placed+1
         self.volume[vol_slice][mask] = value
@@ -330,6 +330,7 @@ def generate_positions(
     max_trials_rot: int = 5,
     max_trials_pos: int = 100,
     value_offset: int = 0,
+    allowed_overlap: float = 0.05
 ) -> Tuple[List[ParticleLike], dict]:
     """
     Generates positions for all particles within the volume. This method assumes a flat sample.
@@ -457,7 +458,7 @@ def generate_positions(
             if vol_slice is None:
                 unsucessfull_tries = unsucessfull_tries + 1
                 continue
-            elif occupancy.occupy(vol_slice, binarized_particle_volume[ptcl_slice], particle_id):
+            elif occupancy.occupy(vol_slice, binarized_particle_volume[ptcl_slice], particle_id, allowed_overlap):
                 pcoords[particles_placed, :] = pos
                 particles_placed = particles_placed + 1
                 pbar.update(1)
@@ -539,6 +540,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--allow_clip", action='store_true', help="Allow clipping of volumes"
+    )
+    parser.add_argument(
+        "--overlap", type=float, default=0.05, help="Allowed relative overlap of particles"
     )
 
     return parser
@@ -654,6 +658,7 @@ def run(args) -> None:
     max_trials_rot = args.max_trials_rot
     max_trials_pos = 6000#args.max_trials_pos
     value_offset = args.value_offset
+    allowed_overlap = args.overlap
 
     if args.random_seed is None:
         random_seed = int(time.time())
@@ -725,6 +730,7 @@ def run(args) -> None:
         max_trials_rot=max_trials_rot,
         max_trials_pos=max_trials_pos,
         value_offset=value_offset,
+        allowed_overlap=allowed_overlap
     )
 
     # Convert positions
