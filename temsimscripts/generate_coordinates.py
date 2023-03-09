@@ -679,7 +679,7 @@ def run(args) -> None:
 
     if pdbs and ptcls is not None:
         assert len(pdbs) == len(ptcls), "ptcls and pdbs must have the same number."
-    else:
+    elif ptcls is None:
         ptcls = [None] * len(pdbs)
 
     if maps is not None:
