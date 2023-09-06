@@ -86,14 +86,6 @@ do
                 shift
             done
             ;;
-        --dose)
-            shift
-            while [[ ! ${1} =~ ^- && ! ${1} == '' ]]
-            do
-                dose=(${dose[@]} ${1})
-                shift
-            done
-            ;;
         --fiducialsize) fiducialsize=${2}; shift; shift;;
         --vesiclesize) vesiclesize=${2}; shift; shift;;
         --nvesicle) nvesicle=${2}; shift; shift;;
@@ -102,6 +94,7 @@ do
         --random_seed) random_seed=${2}; shift; shift;;
         --defocus_lower) defocus_lower=${2}; shift; shift;;
         --defocus_upper) defocus_upper=${2}; shift; shift;;
+        --dose) dose=${2}; shift; shift;;
         --thickness) thickness=${2}; shift; shift;;
         --s1) early_abort=true; shift;;
     esac
