@@ -36,13 +36,14 @@ nvesicle=4
 fiducialsize=50
 vesiclesize=100
 thickness=125
+dose=15000
 random_seed=
 pdbs=()
 pdbs_fil=()
 settings_fil=()
 npdbs=()
 nsubs=()
-dose=()
+
 while [[ $# -gt 0 ]]
 do
     case $1 in
