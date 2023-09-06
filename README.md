@@ -40,7 +40,7 @@ It requires that imod is installed. The require files for simulating filaments c
 A sample command looks like this:
 
 ```bash
-tsimscripts_pipe.sh --pdbs pdbs/*.pdb --npdbs 150 --output out_sim_tomo_1 --random_seed 10 --pdbs_fil filament_files/*.pdb --settings_fil filament_files/*.json --nsubs 100 --random_seed 10
+tsimscripts_pipe.sh --pdbs pdbs/*.pdb --npdbs 150 --output out_sim_tomo_1 --random_seed 10 --pdbs_fil filament_files/*.pdb --settings_fil filament_files/*.json --nsubs 100 --dose 15000 --random_seed 10
 ```
 
 It will generate a tomogram with all pdbs included in the folder `pdbs/` and will add 4 vesicles and 10 fiducials.
