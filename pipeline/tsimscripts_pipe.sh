@@ -42,6 +42,7 @@ pdbs_fil=()
 settings_fil=()
 npdbs=()
 nsubs=()
+dose=()
 while [[ $# -gt 0 ]]
 do
     case $1 in
@@ -82,6 +83,14 @@ do
             while [[ ! ${1} =~ ^- && ! ${1} == '' ]]
             do
                 npdbs=(${npdbs[@]} ${1})
+                shift
+            done
+            ;;
+        --dose)
+            shift
+            while [[ ! ${1} =~ ^- && ! ${1} == '' ]]
+            do
+                dose=(${dose[@]} ${1})
                 shift
             done
             ;;
@@ -128,6 +137,7 @@ fi
 echo $(date) - Inputs
 echo PDBS: ${pdbs[@]}
 echo NPDBS: ${npdbs[@]}
+echo DOSE: ${dose[@]}
 echo PDBS FIL: ${pdbs_fil[@]}
 echo SETTINGS FIL: ${settings_fil[@]}
 echo NSUBS: ${nsubs[@]}
@@ -168,7 +178,7 @@ tsimscripts_gen_coords.py --pdbs ${particle_pdb_dir}/*.pdb --npdbs ${npdbs[@]} -
 
 [[ ${early_abort} == true ]] && exit 0
 echo $(date) - Generate 3D simulation input files
-tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc ${filament_pdb_dir}/*.pdb --coords ${coords_dir}/*.txt ${coords_fil_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness}
+tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc ${filament_pdb_dir}/*.pdb --coords ${coords_dir}/*.txt ${coords_fil_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness} --dose ${dose}
 
 cd ${simulation_dir}
 echo $(date) - Run 3D simulation
