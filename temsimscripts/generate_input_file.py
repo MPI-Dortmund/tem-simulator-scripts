@@ -285,6 +285,7 @@ def create_parser() -> argparse.ArgumentParser:
         parser.add_argument("--defocus_upper", type=float, default=5, help="Upper bound of defocus")
         parser.add_argument("--output_file", default="input.txt", help="Output file path")
         parser.add_argument("--thickness", default=125, help="Thickness in nm")
+        parser.add_argument("--dose", default=15000, help="Total dose in e/nm2")
 
     def create_particle_parser(parser: argparse.ArgumentParser):
         parser.add_argument("--pdbs", type=str, required=True, nargs="+", help="Path to one or more pdbs/maps")
@@ -337,6 +338,7 @@ def _main_():
         defocus_upper = args.defocus_upper
         input_mode = InputMode.tomo
         thickness = args.thickness
+        dose = args.dose
 
     if "particle" in sys.argv[1]:
         input_mode = InputMode.particle
@@ -357,6 +359,7 @@ def _main_():
     if input_mode == InputMode.tomo:
         default_input["sample"]["thickness_edge"] = thickness
         default_input["sample"]["thickness_center"] = thickness
+        default_input["electronbeam"]["total_dose"] = dose
 
     assert len(pdbs) == len(coords) , "Please provide path to coord file for each PDB"
 
