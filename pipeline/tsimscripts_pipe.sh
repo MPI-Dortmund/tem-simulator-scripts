@@ -36,12 +36,14 @@ nvesicle=4
 fiducialsize=50
 vesiclesize=100
 thickness=125
+dose=15000
 random_seed=
 pdbs=()
 pdbs_fil=()
 settings_fil=()
 npdbs=()
 nsubs=()
+
 while [[ $# -gt 0 ]]
 do
     case $1 in
@@ -93,6 +95,7 @@ do
         --random_seed) random_seed=${2}; shift; shift;;
         --defocus_lower) defocus_lower=${2}; shift; shift;;
         --defocus_upper) defocus_upper=${2}; shift; shift;;
+        --dose) dose=${2}; shift; shift;;
         --thickness) thickness=${2}; shift; shift;;
         --s1) early_abort=true; shift;;
     esac
@@ -128,6 +131,7 @@ fi
 echo $(date) - Inputs
 echo PDBS: ${pdbs[@]}
 echo NPDBS: ${npdbs[@]}
+echo DOSE: ${dose[@]}
 echo PDBS FIL: ${pdbs_fil[@]}
 echo SETTINGS FIL: ${settings_fil[@]}
 echo NSUBS: ${nsubs[@]}
@@ -168,7 +172,7 @@ tsimscripts_gen_coords.py --pdbs ${particle_pdb_dir}/*.pdb --npdbs ${npdbs[@]} -
 
 [[ ${early_abort} == true ]] && exit 0
 echo $(date) - Generate 3D simulation input files
-tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc ${filament_pdb_dir}/*.pdb --coords ${coords_dir}/*.txt ${coords_fil_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness}
+tsimscripts_gen_input.py tomogram --pdbs  ${particle_pdb_dir}/*.pdb ${fiducial_dir}/fiducial.mrc ${fiducial_dir}/vesicle.mrc ${filament_pdb_dir}/*.pdb --coords ${coords_dir}/*.txt ${coords_fil_dir}/*.txt --defocus_upper ${defocus_upper} --defocus_lower ${defocus_lower} --output_file ${simulation_dir}/input.txt --thickness ${thickness} --dose ${dose}
 
 cd ${simulation_dir}
 echo $(date) - Run 3D simulation
