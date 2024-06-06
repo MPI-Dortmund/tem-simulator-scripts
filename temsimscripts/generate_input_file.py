@@ -361,7 +361,7 @@ def _main_():
         default_input["sample"]["thickness_center"] = thickness
         default_input["electronbeam"]["total_dose"] = dose
 
-    assert len(pdbs) == len(coords) , "Please provide path to coord file for each PDB"
+    assert len(pdbs) == len(coords) , f"Please provide path to coord file {len(coords)} for each PDB {len(pdbs)}"
 
     sets = []
     for i, pdb in enumerate(pdbs):

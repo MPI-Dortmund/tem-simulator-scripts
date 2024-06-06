@@ -542,7 +542,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--allow_clip", action='store_true', help="Allow clipping of volumes"
     )
     parser.add_argument(
-        "--overlap", type=float, default=0.05, help="Allowed relative overlap of particles"
+        "--overlap", type=float, default=0, help="Allowed relative overlap of particles"
     )
 
     return parser
