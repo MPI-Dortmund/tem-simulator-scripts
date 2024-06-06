@@ -39,6 +39,7 @@ setup(
             'tsimscripts_gen_map.py = temsimscripts.generate_map:_main_',
             'tsimscripts_gen_coords.py = temsimscripts.generate_coordinates:_main_',
             'tsimscripts_extract.py = temsimscripts.extract_subvolumes:_main_',
+            'tsimscripts_extract_noise.py = temsimscripts.extract_noise:_main_',
         ]},
     scripts = [
         'pipeline/tsimscripts_pipe.sh'
