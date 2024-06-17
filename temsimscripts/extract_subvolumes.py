@@ -42,12 +42,14 @@ class ParticleLike:
     def extract(self, volume: np.array) -> np.array:
         if self.origin == Origin.CENTER:
             self.make_coord_LL(volume_shape=volume.shape)
-        nx1 = (int(self.x) - (self.box_size - 1) // 2)
-        nx2 = (int(self.x) + (self.box_size - 1) // 2 + 1)
-        ny1 = (int(self.y) - (self.box_size - 1) // 2)
-        ny2 = (int(self.y) + (self.box_size - 1) // 2 + 1)
-        nz1 = (int(self.z) - (self.box_size - 1) // 2)
-        nz2 = (int(self.z) + (self.box_size - 1) // 2 + 1)
+
+        odd_fact = self.box_size % 2
+        nx1 = (int(self.x) - (self.box_size - odd_fact) // 2)
+        nx2 = (int(self.x) + (self.box_size - odd_fact) // 2 + odd_fact)
+        ny1 = (int(self.y) - (self.box_size - odd_fact) // 2)
+        ny2 = (int(self.y) + (self.box_size - odd_fact) // 2 + odd_fact)
+        nz1 = (int(self.z) - (self.box_size - odd_fact) // 2)
+        nz2 = (int(self.z) + (self.box_size - odd_fact) // 2 + odd_fact)
         subvol = volume[nz1: nz2, ny1: ny2, nx1: nx2]
         if subvol.shape != (self.box_size, self.box_size, self.box_size):
             raise OutOfVolumeException
