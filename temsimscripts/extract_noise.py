@@ -7,12 +7,14 @@ import numpy as np
 
 
 def extract(vol, coords, size):
-    pos0_from = (coords[0] - (size - 1) // 2)
-    pos0_to = (coords[0] + (size - 1) // 2 + 1)
-    pos1_from = (coords[1] - (size - 1) // 2)
-    pos1_to = (coords[1] + (size - 1) // 2 + 1)
-    pos2_from = (coords[2] - (size - 1) // 2)
-    pos2_to = (coords[2] + (size - 1) // 2 + 1)
+
+    odd_fact = size % 2 == 0
+    pos0_from = (coords[0] - (size - odd_fact) // 2)
+    pos0_to = (coords[0] + (size - odd_fact) // 2 + odd_fact)
+    pos1_from = (coords[1] - (size - odd_fact) // 2)
+    pos1_to = (coords[1] + (size - odd_fact) // 2 + odd_fact)
+    pos2_from = (coords[2] - (size - odd_fact) // 2)
+    pos2_to = (coords[2] + (size - odd_fact) // 2 + odd_fact)
 
     sub = vol[pos0_from: pos0_to, pos1_from: pos1_to, pos2_from: pos2_to]
 
