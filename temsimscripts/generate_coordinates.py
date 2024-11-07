@@ -349,6 +349,10 @@ def generate_positions(
         thetha = np.random.rand() * 2 * tilt_range  # thetha
         psi = np.random.rand() * 360  # psi
         thetha += 90 - tilt_range
+      #  phi = 0 * 360  # phi
+      #  thetha = 0 * 2 * tilt_range  # thetha
+      #  psi = 0 * 360  # psi
+        thetha += 90 - tilt_range
 
         return (phi, thetha, psi)
 
@@ -507,9 +511,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--vdiameter", type=int, default=512, help="Volume diameter in nm"
-    )
-    parser.add_argument("--vheight", type=int, default=125, help="Volume height in nm")
-    parser.add_argument("--imodheight", type=int, default=200, help="Imod output Volume height in nm")
+    )   # originally 512
+    parser.add_argument("--vheight", type=int, default=125, help="Volume height in nm")    #originally 125
+    parser.add_argument("--imodheight", type=int, default=200, help="Imod output Volume height in nm")     # originally 200
     parser.add_argument("--random_seed", type=int, help="Random seed")
     parser.add_argument(
         "--ptcls", type=str, nargs="+", help="Path to mrc ptcl files"
@@ -762,18 +766,18 @@ def run(args) -> None:
                 axes=(1, 2)
             )
             mrc.set_data(swap_volume)
-            mrc.voxel_size = 10.20
+            mrc.voxel_size = 10.20 /2   # originally with no division
             mrc.header.origin.z = -1024
 
     if args.write_raw_occupancy:
         with mrcfile.new(os.path.join(output, 'occupancy_raw.mrc'), overwrite=True) as mrc:
             mrc.set_data(occupancy.volume)
-            mrc.voxel_size = 10.20
+            mrc.voxel_size = 10.20 /2   # originally with no division
             mrc.header.origin.z = -1024
 
         with mrcfile.new(os.path.join(output, 'occupancy_pid.mrc'), overwrite=True) as mrc:
             mrc.set_data(occupancy.particle_id_volume)
-            mrc.voxel_size = 10.20
+            mrc.voxel_size = 10.20 /2   # originally with no division
             mrc.header.origin.z = -1024
         with open(os.path.join(output, "class_size_dict.json"), "w") as outfile:
             json.dump(occupancy.particle_sizes, outfile)

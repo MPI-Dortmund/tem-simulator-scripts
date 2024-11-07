@@ -91,6 +91,7 @@ def read_apix(path_vol: Path):
 
     if path_vol.exists() and path_vol.is_file():
         with mrcfile.mmap(path_vol) as mrc:
+            print(mrc.voxel_size)
             return mrc.voxel_size
     else:
         raise ValueError("Your input volume does not exist.")
@@ -99,6 +100,7 @@ def read_apix(path_vol: Path):
 def read_volume(path_vol: Path) -> np.array:
     if path_vol.exists() and path_vol.is_file():
         with mrcfile.open(path_vol) as mrc:
+            print(mrc.data.shape)
             return mrc.data
     else:
         raise ValueError("Your input volume does not exist.")
@@ -109,7 +111,7 @@ def get_identifier(path: Path):
     name = os.path.splitext(path.name)[0]
     return name.split("_")[0]
 
-def get_coordinates(path_coord: Path, pixel_size=1.02041) -> List[Tuple]:
+def get_coordinates(path_coord: Path, pixel_size=1.02041/2) -> List[Tuple]:   # I made a change here pixel_size
     with open(path_coord, 'r') as file1:
         lines = file1.readlines()
     coords = []
