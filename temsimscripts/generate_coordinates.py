@@ -352,7 +352,7 @@ def generate_positions(
       #  phi = 0 * 360  # phi
       #  thetha = 0 * 2 * tilt_range  # thetha
       #  psi = 0 * 360  # psi
-        thetha += 90 - tilt_range
+       # thetha += 90 - tilt_range
 
         return (phi, thetha, psi)
 
@@ -509,11 +509,9 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--ndilations", type=int, default=1, help="Number of dilations to perform on the input volume if --ptcls is provided. Will be ignored otherwise."
     )
-    parser.add_argument(
-        "--vdiameter", type=int, default=512, help="Volume diameter in nm"
-    )   # originally 512
-    parser.add_argument("--vheight", type=int, default=125, help="Volume height in nm")    #originally 125
-    parser.add_argument("--imodheight", type=int, default=200, help="Imod output Volume height in nm")     # originally 200
+    parser.add_argument("--vdiameter", type=int, default=512, help="Volume diameter in nm") 
+    parser.add_argument("--vheight", type=int, default=125, help="Volume height in nm")    
+    parser.add_argument("--imodheight", type=int, default=200, help="Imod output Volume height in nm")    
     parser.add_argument("--random_seed", type=int, help="Random seed")
     parser.add_argument(
         "--ptcls", type=str, nargs="+", help="Path to mrc ptcl files"
