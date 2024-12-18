@@ -196,11 +196,11 @@ OutputFile	tiltseries${suffix}_ali.mrc
 TransformFile	tiltseries${suffix}.xf
 TaperAtFill	1,1
 AdjustOrigin	
-SizeToOutputInXandY	512,512
+SizeToOutputInXandY	1024,1024
 OffsetsInXandY	0.0,0.0
 #DistortionField	.idf
 ImagesAreBinned	1.0
-BinByFactor	2
+BinByFactor	1
 #GradientFile	tiltseries${suffix}.maggrad
 \$if (-e ./savework) ./savework
 EOF
@@ -210,7 +210,7 @@ EOF
 \$tilt -StandardInput
 InputProjections tiltseries${suffix}_ali.mrc
 OutputFile tiltseries${suffix}_full_rec.mrc
-IMAGEBINNED 2
+IMAGEBINNED 1
 TILTFILE tiltseries${suffix}.tlt
 THICKNESS 400
 RADIAL 0.35 0.035
